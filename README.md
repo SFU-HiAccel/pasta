@@ -3,6 +3,39 @@
 PASTA is built upon TAPA and adds *buffer* channel support. If you're not familiar with the TAPA project please refer to [TAPA](https://github.com/UCLA-VAST/tapa) and its documentation [here](https://tapa.rtfd.io/).
 
 
+## Installation
+PASTA can be installed using the installer script already provided.
+We recommend using a Conda environment for the PASTA project. If a different environment is being used, please follow the detailed installation steps to build from source.
+
+### Download the repository
+
+```
+git clone https://github.com/SFU-HiAccel/pasta.git
+### OR ###
+git clone git@github.com:SFU-HiAccel/pasta.git
+```
+
+### Setup a Conda environment
+[Install Miniconda](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html)  
+
+```
+conda create -y --name "pasta"
+conda activate pasta
+```
+
+### Build PASTA
+Once you have a custom conda environment loaded, navigate to the `installer` folder and run the `install` script.
+
+```
+cd <repo_root>/installer
+./install
+```
+
+Once the installation is complete, a `setup` file will be created in the project directory.  
+Please use `source setup` to setup the current shell with the required PATHs.
+
+---
+
 ## Summary of Usage
 TAPA supports FIFO stream based communication channels between tasks. With PASTA, a producer task can send a chunk of data (under the hood stored in BRAMs or URAMs) to a consumer task in a ping-pong fashion.
 <details>
