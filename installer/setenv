@@ -1,0 +1,7 @@
+export PATH=$CONDA_PREFIX/bin:$PATH
+export CPATH=$CONDA_PREFIX/include/
+export LD_LIBRARY_PATH=$CONDA_PREFIX/lib/:$LD_LIBRARY_PATH
+echo "PATH: "$(echo $PATH | grep --color=always $(basename $PROJECT_DIR))
+echo "CPATH: "$(echo $CPATH | grep --color=always $(basename $PROJECT_DIR))
+echo "LD_LIBRARY_PATH: "$(echo $LD_LIBRARY_PATH | grep --color=always $(basename $PROJECT_DIR))
+

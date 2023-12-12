@@ -1,0 +1,71 @@
+#!/bin/bash
+
+##----------
+## Conda Installation
+##----------
+CONDA_PATH=$(which conda)
+if [[ $CONDA_PATH == "" ]]; then
+	echo "ERROR: Conda isn't installed."
+	exit
+fi
+if [[ $CONDA_PREFIX == "" ]]; then
+	echo "ERROR: Looks like Conda environment isn't loaded."
+	exit
+fi
+
+conda install -y -c anaconda cmake python=3.9
+PROJECT_DIR=$(dirname $PWD)
+
+##----------
+## PASTA
+##----------
+cd $PROJECT_DIR
+git checkout main
+cd tapa
+TAPA_DIR=$PWD
+cd backend/python && pip3 install --editable .
+echo "INFO: Installed TAPAC backend"
+
+# Build tapac
+cd $TAPA_DIR
+if [[ -d build ]]; then
+	echo "ERROR: A build folder already exists."
+	echo "If you wish to reinstall, delete the existing build with:"
+	echo "rm -rf $TAPA_DIR/build"
+	exit
+fi
+mkdir build && cd build
+cmake ..
+# Launch the build on limited procs, based on avg load of the last 5 minutes.
+# This might accelerate single runs, but is super bad for batch jobs.
+AVG_LOAD=$(cat /proc/loadavg | awk '{print $2; }')
+AVG_LOAD=${AVG_LOAD%.*}
+# but leave 4 procs for sanity
+JOBS=$(($(nproc --all)-$AVG_LOAD-4))
+echo "Launching CMake with $JOBS jobs"
+make -j $JOBS
+
+
+#----------
+# Install in environment
+#----------
+echo "Linking install..."
+mkdir -p $CONDA_PREFIX/bin
+mkdir -p $CONDA_PREFIX/include
+mkdir -p $CONDA_PREFIX/lib
+ln -sfn "${PWD}"/backend/tapacc $CONDA_PREFIX/bin/
+ln -sfn "${PWD}"/../src/tapa $CONDA_PREFIX/include/
+ln -sfn "${PWD}"/../src/tapa.h $CONDA_PREFIX/include/
+ln -sfn "${PWD}"/libtapa.a $CONDA_PREFIX/lib/
+ln -sfn "${PWD}"/libtapa.so $CONDA_PREFIX/lib/
+
+cd $PROJECT_DIR
+touch setup
+echo "#!/bin/bash" > setup
+echo "export PROJECT_DIR=$PROJECT_DIR" >> setup
+echo "conda activate $(basename $CONDA_PREFIX)" >> setup
+cat installer/setenv >> setup
+
+echo -en "Done!\n\nAfter navigating to the project directory $PROJECT_DIR, use \`source setup\` to load the environment.\n"
+
+
