@@ -25,7 +25,7 @@ def four_way_partition(
   hbm_port_v_list: List[Vertex] = [],
 ) -> Dict[Vertex, Slot]:
 
-  import pdb; pdb.set_trace()
+  #import pdb; pdb.set_trace()
 
   m = get_mip_model_silent()
 

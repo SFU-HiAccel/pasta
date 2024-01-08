@@ -49,7 +49,6 @@ def annotate_floorplan(config: Dict) -> Dict:
       pre_assignment[mod_name] = region
 
   kwargs = get_floorplan_params(config)
-  import pdb; pdb.set_trace()
   # generate floorplan
   # slot_list includes all possible slot regardless of whether it is empty
   v2s, slot_list = autobridge_floorplan.get_floorplan(
@@ -59,6 +58,8 @@ def annotate_floorplan(config: Dict) -> Dict:
     pre_assignment,
     **kwargs,
   )
+
+  #import pdb; pdb.set_trace()
 
   # if floorplan failed
   if v2s is None:
@@ -105,7 +106,10 @@ def get_floorplan_params(config) -> Dict:
       kwargs[param] = config[param]
 
   # u280 only: get the hbm port list
-  if config['part_num'].startswith('xcu280') and config.get('enable_hbm_binding_adjustment', False):
+  is_u280 = config['part_num'].startswith('xcu280')
+  is_u50  = config['part_num'].startswith('xcu50')
+
+  if (is_u280 or is_u50) and config.get('enable_hbm_binding_adjustment', False):
     hbm_port_v_name_list = []
     for v, props in config['vertices'].items():
       if props['category'] == 'PORT_VERTEX' and props['port_cat'] == 'HBM':
