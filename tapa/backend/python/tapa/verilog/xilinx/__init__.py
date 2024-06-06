@@ -76,6 +76,10 @@ def pack(top_name: str, rtl_dir: str, ports: Iterable[tapa.instance.Port],
         top_name=top_name,
         kernel_xml=kernel_xml_obj.name,
         hdl_dir=rtl_dir,
+        #### This allows the top-level module to have stream I/O.
+        iface_names=[
+            p for p in port_tuple if (port.cat.is_istream or port.cat.is_ostream)
+        ]
         m_axi_names={
             port.name: {
                 'HAS_BURST': '0',
