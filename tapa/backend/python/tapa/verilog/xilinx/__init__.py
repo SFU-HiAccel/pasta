@@ -71,15 +71,17 @@ def pack(top_name: str, rtl_dir: str, ports: Iterable[tapa.instance.Port],
                                    suffix='_kernel.xml') as kernel_xml_obj:
     print_kernel_xml(name=top_name, ports=port_tuple, kernel_xml=kernel_xml_obj)
     kernel_xml_obj.flush()
+
+    interface_names = [backend.S_AXI_NAME]
+    interface_names.extend((p.name) for p in port_tuple if (p.cat.is_istream or p.cat.is_ostream))
+
     with backend.PackageXo(
         xo_file=xo_file,
         top_name=top_name,
         kernel_xml=kernel_xml_obj.name,
         hdl_dir=rtl_dir,
         #### This allows the top-level module to have stream I/O.
-        iface_names=[
-            p.name for p in port_tuple if (p.cat.is_istream or p.cat.is_ostream)
-        ],
+        iface_names=interface_names,
         m_axi_names={
             port.name: {
                 'HAS_BURST': '0',
