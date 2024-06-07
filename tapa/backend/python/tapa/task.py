@@ -73,10 +73,10 @@ class Task:
           sorted((item for item in kwargs.pop('tasks', {}).items()),
                  key=lambda x: x[0]))
       self.fifos = collections.OrderedDict(
-          sorted((item for item in kwargs.pop('fifos').items()),
+          sorted((item for item in kwargs.pop('fifos', {}).items()),
                  key=lambda x: x[0]))
       self.buffers = collections.OrderedDict(
-          sorted((item for item in kwargs.pop('buffers').items()),
+          sorted((item for item in kwargs.pop('buffers', {}).items()),
                  key=lambda x: x[0]))
       # if a buffer is instantiated in this task, create config object
       # and put it in the dictionary that maps buffer_names to config
