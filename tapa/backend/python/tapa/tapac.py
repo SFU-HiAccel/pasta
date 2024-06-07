@@ -684,10 +684,12 @@ def main(argv: Optional[List[str]] = None):
       with open(args.output_file, 'wb') as packed_obj:
         program.pack_rtl(packed_obj)
         _logger.info('generate the v++ xo file at %s', args.output_file)
-    except:
+    except Exception as e:
       _logger.error(
           'Fail to create the v++ xo file at %s. Check if you have write'
           'permission', args.output_file)
+      _logger.error(
+          'The Exception that happened was: %s', e)
 
     # trim the '.xo' from the end
     if args.output_file.endswith('.xo'):
