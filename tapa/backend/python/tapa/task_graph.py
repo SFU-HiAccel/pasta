@@ -28,20 +28,30 @@ def get_fifo_edges(
   fifo_edges = {}
   # Generate edges for FIFOs instantiated in the top task.
   for fifo_name, fifo in top_task.fifos.items():
-    fifo_edges[rtl.sanitize_array_name(fifo_name)] = {
-        'produced_by':
-            'TASK_VERTEX_' + util.get_instance_name(fifo['produced_by']),
-        'consumed_by':
-            'TASK_VERTEX_' + util.get_instance_name(fifo['consumed_by']),
-        'width':
-            fifo_width_getter(top_task, fifo_name),
-        'depth':
-            top_task.fifos[fifo_name]['depth'],
-        'instance':
-            rtl.sanitize_array_name(fifo_name),
-        'category':
-            'FIFO_EDGE',
-    }
+    try:
+      util.get_instance_name(fifo['produced_by'])
+      util.get_instance_name(fifo['consumed_by'])
+    except KeyError:
+      if (fifo.get('produced_by')) is None:
+        _logger.warning('The fifo named "%s" does not have a producer', fifo_name)
+      if (fifo.get('consumed_by')) is None:
+        _logger.warning('The fifo named "%s" does not have a consumer', fifo_name)
+      continue
+    else:
+      fifo_edges[rtl.sanitize_array_name(fifo_name)] = {
+          'produced_by':
+              'TASK_VERTEX_' + util.get_instance_name(fifo['produced_by']),
+          'consumed_by':
+              'TASK_VERTEX_' + util.get_instance_name(fifo['consumed_by']),
+          'width':
+              fifo_width_getter(top_task, fifo_name),
+          'depth':
+              top_task.fifos[fifo_name]['depth'],
+          'instance':
+              rtl.sanitize_array_name(fifo_name),
+          'category':
+              'FIFO_EDGE',
+      }
 
   return type_marked(fifo_edges, 'FIFO_EDGE')
 
