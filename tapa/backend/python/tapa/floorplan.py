@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import sys
+import subprocess
 from collections import defaultdict
 from concurrent import futures
 from typing import Callable, Dict, List, Optional, TextIO, Tuple
@@ -25,10 +26,27 @@ _logger = logging.getLogger().getChild(__name__)
 class InputError(Exception):
   pass
 
+# global variable to cache result of `v++ --version`
+vpp_version_output = None
+def is_vpp_version(version_string):
+    global vpp_version_output
+
+    # if the output is not already cached, run the command and cache it
+    if vpp_version_output is None:
+        try:
+            result = subprocess.run(['v++', '--version'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            vpp_version_output = result.stdout
+        except Exception as e:
+            _logger.error(f"An error occurred when checking for v++ version: {e}")
+            return False
+
+    # check if the version string is in the cached output
+    return version_string in vpp_version_output
+
 
 def get_base_path_tcl(config_with_floorplan):
   part_num = config_with_floorplan['part_num']
-  if part_num.startswith('xcu200') or part_num.startswith('xcu50'):
+  if part_num.startswith('xcu200') or part_num.startswith('xcu50') or is_vpp_version('v2023') or is_vpp_version('v2022'):
     return 'level0_i/ulp'
   else:
     return 'pfm_top_i/dynamic_region'
