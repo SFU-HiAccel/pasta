@@ -51,6 +51,15 @@ def get_base_path_tcl(config_with_floorplan):
   else:
     return 'pfm_top_i/dynamic_region'
 
+
+def get_state_var_inst_name_prefix_tcl(config_with_floorplan):
+  part_num = config_with_floorplan['part_num']
+  if is_vpp_version('v2023') or is_vpp_version('v2022'):
+    return 'FSM_sequential_'
+  else:
+    return ''
+
+
 def generate_floorplan(
     part_num: str,
     physical_connectivity: TextIO,
@@ -244,7 +253,11 @@ def get_vivado_tcl(config_with_floorplan):
     region_to_inst[region].append(inst)
 
     # floorplan some control signals
-    region_to_inst[region].append(f'{inst}__state.*')
+    state_variable_instance_regex = "{prefix}{inst}__state.*".format(
+            prefix = get_state_var_inst_name_prefix_tcl(config_with_floorplan),
+            inst = inst
+    )
+    region_to_inst[region].append(state_variable_instance_regex)
 
   # floorplan pipeline registers
   for edge, properties in config_with_floorplan['edges'].items():
