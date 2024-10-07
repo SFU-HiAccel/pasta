@@ -719,21 +719,11 @@ def _get_device_info(
     device_info: Dict[str, str] = {},
 ) -> Dict[str, str]:
   if not device_info:
-    # allow explicitly specifying the path of platforms directory via env var if in non-standard location
-    tapa_xilinx_platforms_dir = os.environ.get('TAPA_XILINX_PLATFORMS_DIR', '')
-    transformed_platform_arg = 'transformed_platform'
-    if hasattr(args, 'platform'):
-      if tapa_xilinx_platforms_dir:
-        setattr(args, transformed_platform_arg, os.path.join(tapa_xilinx_platforms_dir, args.platform))
-        _logger.info(f"Explicit platform dir provided. Complete path: {getattr(args, transformed_platform_arg)}")
-      else:
-        setattr(args, transformed_platform_arg, getattr(args, 'platform', ''))
-
     device_info.update(
         haoda.backend.xilinx.parse_device_info(
             parser,
             args,
-            platform_name=transformed_platform_arg,
+            platform_name='platform',
             part_num_name='part_num',
             clock_period_name='clock_period',
         ))
@@ -742,3 +732,4 @@ def _get_device_info(
 
 if __name__ == '__main__':
   main()
+
